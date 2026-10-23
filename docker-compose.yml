@@ -1,0 +1,11 @@
+name: city-widget
+
+services:
+  city-widget:
+    build: .
+    container_name: city-widget
+    restart: unless-stopped
+    environment:
+      TIMEPAD_API_TOKEN: ${TIMEPAD_API_TOKEN:-}
+    ports:
+      - "80:80"
