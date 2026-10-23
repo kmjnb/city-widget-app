@@ -45,7 +45,7 @@ export default function EventDialog({ event, favorite, onClose, onToggleFavorite
       <span className={`dialog-category cat-${CATEGORY_COLORS[event.category]}`}>{CATEGORY_NAMES[event.category]} · сегодня, {event.time}</span>
       <h2 id="dialog-title">{event.title}</h2><p id="dialog-description">{event.description}</p>
       <div className="dialog-venue"><span><MapPin size={14} aria-hidden="true" />{event.venue}</span><strong>{event.priceLabel}</strong></div>
-      <div className="dialog-actions"><button className="dialog-favorite" onClick={onToggleFavorite}><Heart size={17} fill={favorite ? 'currentColor' : 'none'} />{favorite ? 'В избранном' : 'Добавить в избранное'}</button>{event.url && <a className="dialog-source" href={event.url} target="_blank" rel="noreferrer">На KudaGo <ArrowRight size={15} /></a>}</div>
+      <div className="dialog-actions"><button className="dialog-favorite" onClick={onToggleFavorite}><Heart size={17} fill={favorite ? 'currentColor' : 'none'} />{favorite ? 'В избранном' : 'Добавить в избранное'}</button>{event.url && <a className="dialog-source" href={event.url} target="_blank" rel="noreferrer">Открыть в {event.source || (event.id.startsWith('timepad-') ? 'TimePad' : 'KudaGo')} <ArrowRight size={15} /></a>}</div>
     </section>
   </div>
 }

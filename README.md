@@ -41,11 +41,11 @@ docker compose up -d --build
 - `src/components` — общая шапка и погодные эффекты.
 - `src/features` — экраны и компоненты погоды, афиши, планов дня и событий.
 - `src/domain` — модели данных и преобразование записей афиши.
-- `src/services` — запросы к Open-Meteo и KudaGo.
+- `src/services` — запросы к Open-Meteo, TimePad и KudaGo.
 - `src/hooks` — загрузка данных выбранного города.
 - `src/config` и `src/utils` — списки городов, категории, форматирование дат и локальное хранилище.
 - `src/styles` — базовые стили, компоненты афиши и стили экранов приложения. Порядок подключения сохраняет каскад интерфейса.
 
 В проекте не настроена отдельная команда тестирования или линтер. Перед выпуском доступна строгая проверка TypeScript и production-сборка командой `npm run build`.
 
-Источники: [Open-Meteo](https://open-meteo.com/) и [KudaGo API](https://docs.kudago.com/api/).
+Источники: [Open-Meteo](https://open-meteo.com/), [TimePad API](https://api.timepad.ru/) и [KudaGo API](https://docs.kudago.com/api/).

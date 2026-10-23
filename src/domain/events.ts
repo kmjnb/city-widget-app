@@ -32,8 +32,6 @@ const eventCategory = (event: ApiEvent): Category => {
 export const eventFromApi = (event: ApiEvent): EventItem => {
   const date = event.dates?.[0]
   const price = numberFromPrice(event.price, event.is_free)
-  const image = event.images?.find(item => item.image)?.image?.replace(/^http:/, 'https:')
-
   return {
     id: `event-${event.id}`,
     title: event.short_title || event.title || 'Городское событие',
@@ -45,7 +43,7 @@ export const eventFromApi = (event: ApiEvent): EventItem => {
     popularity: event.favorites_count || 0,
     description: [event.tagline, event.description, event.body_text].filter(Boolean).join('\n\n')
       || 'Подробности и расписание — на странице события.',
-    image,
+    source: 'KudaGo',
     url: event.site_url?.replace(/^http:/, 'https:'),
   }
 }
@@ -63,7 +61,7 @@ export const showingFromApi = (showing: ApiShowing): EventItem => {
     priceLabel: formatPrice(price, showing.price),
     popularity: 0,
     description: `Сегодняшний киносеанс в ${showing.place?.title || 'городе'}. Время и билеты смотрите на странице площадки.`,
-    image: showing.movie?.poster?.image?.replace(/^http:/, 'https:'),
+    source: 'KudaGo',
   }
 }
 

@@ -43,7 +43,7 @@ export type EventItem = {
   priceLabel: string
   popularity: number
   description: string
-  image?: string
+  source?: 'TimePad' | 'KudaGo'
   url?: string
 }
 
@@ -62,13 +62,12 @@ export type ApiEvent = {
   is_free?: boolean
   site_url?: string
   favorites_count?: number
-  images?: Array<{ image?: string }>
 }
 
 export type ApiShowing = {
   id: number
   datetime?: number
-  movie?: { title?: string; poster?: { image?: string } }
+  movie?: { title?: string }
   place?: { title?: string; address?: string }
   price?: string
 }
@@ -81,7 +80,6 @@ export type TimepadEvent = {
   description_short?: string
   description_html?: string
   url?: string
-  poster_image?: { default_url?: string }
   location?: { name?: string; city?: string; address?: string }
   categories?: Array<{ name?: string }>
   price_min?: number

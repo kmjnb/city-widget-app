@@ -27,12 +27,8 @@ const isApiEvent = (value: unknown): value is ApiEvent => {
   const placeIsValid = isOptionalObject(value.place, place => isOptionalString(place.title) && isOptionalString(place.address))
   const datesAreValid = value.dates === undefined || (Array.isArray(value.dates) && value.dates.every(date =>
     isObject(date) && isOptionalNumber(date.start) && isOptionalString(date.start_time)))
-  const imagesAreValid = value.images === undefined || (Array.isArray(value.images) && value.images.every(image =>
-    isObject(image) && isOptionalString(image.image)))
-
   return placeIsValid
     && datesAreValid
-    && imagesAreValid
     && isOptionalString(value.title)
     && isOptionalString(value.short_title)
     && isOptionalString(value.description)
@@ -49,8 +45,7 @@ const isApiEvent = (value: unknown): value is ApiEvent => {
 const isApiShowing = (value: unknown): value is ApiShowing => {
   if (!isObject(value) || typeof value.id !== 'number') return false
   const placeIsValid = isOptionalObject(value.place, place => isOptionalString(place.title) && isOptionalString(place.address))
-  const movieIsValid = isOptionalObject(value.movie, movie => isOptionalString(movie.title)
-    && isOptionalObject(movie.poster, poster => isOptionalString(poster.image)))
+  const movieIsValid = isOptionalObject(value.movie, movie => isOptionalString(movie.title))
 
   return placeIsValid && movieIsValid && isOptionalNumber(value.datetime) && isOptionalString(value.price)
 }
@@ -70,7 +65,6 @@ const isTimepadEvent = (value: unknown): value is TimepadEvent => isObject(value
   && isOptionalObject(value.location, location => isOptionalString(location.name)
     && isOptionalString(location.city)
     && isOptionalString(location.address))
-  && isOptionalObject(value.poster_image, image => isOptionalString(image.default_url))
   && (value.categories === undefined || (Array.isArray(value.categories) && value.categories.every(category =>
     isObject(category) && isOptionalString(category.name))))
   && (value.ticket_types === undefined || (Array.isArray(value.ticket_types) && value.ticket_types.every(ticket =>
@@ -119,7 +113,7 @@ const getTimepadParams = (city: City) => {
     starts_at_min: new Date(since * 1000).toISOString(),
     starts_at_max: new Date((until - 1) * 1000).toISOString(),
     sort: '+starts_at',
-    fields: 'location,categories,ticket_types,description_short,description_html,price_min,price_max,poster_image',
+    fields: 'location,categories,ticket_types,description_short,description_html,price_min,price_max',
   })
 }
 
@@ -158,7 +152,7 @@ const eventFromTimepad = (event: TimepadEvent): EventItem => {
     popularity: 0,
     description: cleanDescription(event.description_short || event.description_html)
       || 'Подробности и билеты — на странице события.',
-    image: event.poster_image?.default_url?.replace(/^http:/, 'https:'),
+    source: 'TimePad',
     url: event.url?.replace(/^http:/, 'https:'),
   }
 }
@@ -170,7 +164,7 @@ const getTimepadEvents = async (city: City) => {
 }
 
 const getKudagoEvents = async (city: City) => {
-  const eventParams = kudagoParams(city, 'id,title,short_title,description,body_text,dates,place,categories,tags,tagline,price,is_free,site_url,favorites_count,images', 'dates,place,images')
+  const eventParams = kudagoParams(city, 'id,title,short_title,description,body_text,dates,place,categories,tags,tagline,price,is_free,site_url,favorites_count', 'dates,place')
   eventParams.set('order_by', '-favorites_count,-id')
   const movieParams = kudagoParams(city, 'id,movie,place,datetime,price', 'movie,place')
   const [eventPayload, moviePayload] = await Promise.all([

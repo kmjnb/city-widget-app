@@ -25,7 +25,7 @@ const isEvent = (value: unknown): value is EventItem => isObject(value)
   && typeof value.priceLabel === 'string'
   && typeof value.popularity === 'number'
   && typeof value.description === 'string'
-  && (value.image === undefined || typeof value.image === 'string')
+  && (value.source === undefined || value.source === 'TimePad' || value.source === 'KudaGo')
   && (value.url === undefined || typeof value.url === 'string')
 
 const isEventList = (value: unknown): value is EventItem[] => Array.isArray(value) && value.every(isEvent)
