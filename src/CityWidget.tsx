@@ -90,7 +90,8 @@ export default function CityWidget() {
     setEventsState('loading')
     const { since, until } = dayBounds()
     const common = new URLSearchParams({ lang: 'ru', location: selectedCity.slug, actual_since: String(since), actual_until: String(until), page_size: '100' })
-    const base = 'https://kudago.com/public-api/v1.4'
+    // Keep KudaGo requests same-origin during local development to avoid browser CORS failures.
+    const base = import.meta.env.DEV ? '/api/kudago/v1.4' : 'https://kudago.com/public-api/v1.4'
     const eventParams = new URLSearchParams(common)
     eventParams.set('fields', 'id,title,short_title,description,body_text,dates,place,categories,tags,tagline,price,is_free,site_url,favorites_count,images')
     eventParams.set('expand', 'dates,place,images')
@@ -105,7 +106,10 @@ export default function CityWidget() {
       ])
       const eventResponse = results[0].status === 'fulfilled' ? results[0].value : null
       const movieResponse = results[1].status === 'fulfilled' ? results[1].value : null
-      if (!eventResponse && !movieResponse) throw new Error('Events API unavailable')
+      if (!eventResponse && !movieResponse) {
+        console.error('Both KudaGo endpoints failed', results.map(result => result.status === 'rejected' ? result.reason : null))
+        throw new Error('Events API unavailable')
+      }
       const liveEvents: EventItem[] = [
         ...((eventResponse?.results || []) as ApiEvent[]).map(eventFromApi),
         ...((movieResponse?.results || []) as ApiShowing[]).map(showingFromApi),
@@ -114,7 +118,7 @@ export default function CityWidget() {
       unique.sort((a, b) => a.time.localeCompare(b.time))
       setEvents(unique)
       setEventsState('ready')
-    } catch { setEvents([]); setEventsState('error') }
+    } catch (error) { console.error('KudaGo API request failed', error); setEvents([]); setEventsState('error') }
   }
   useEffect(() => { void loadWeather(city); void loadEvents(city) }, [city])
   useEffect(() => { localStorage.setItem('city-widget-favorites', JSON.stringify(favorites)) }, [favorites])
