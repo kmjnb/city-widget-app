@@ -13,15 +13,28 @@ npm run dev
 
 Для загрузки афиши нужен серверный токен TimePad. Скопируйте `.env.example` в `.env.local` и укажите `TIMEPAD_API_TOKEN`. Токен не попадает в клиентскую сборку. Без него список покажет ошибку API и кнопку повтора.
 
-## Запуск на сервере
+## Развёртывание на сервере через Nginx
 
-На Ubuntu-сервере создайте `.env` из `.env.example`, задайте `TIMEPAD_API_TOKEN`, затем выполните:
+На production-сервере Nginx раздаёт статические файлы из `/var/www/city-widget/current` и проксирует API-запросы. Vite-сервер нужен только для локальной разработки: перед выкладкой соберите сайт.
 
 ```bash
-docker compose up -d --build
+npm ci
+npm run build
 ```
 
-После запуска сайт доступен по HTTP на IP сервера. Nginx отдаёт production-сборку и проксирует запросы к TimePad и KudaGo. Секрет TimePad хранится только в окружении контейнера и добавляется к серверному запросу.
+Создайте каталог для нового релиза на сервере и скопируйте в него содержимое `dist`. Замените `<server-ip>` и `<release-name>` своими значениями:
+
+```bash
+ssh root@<server-ip> "mkdir -p /var/www/city-widget/releases/<release-name>"
+scp -r dist/* root@<server-ip>:/var/www/city-widget/releases/<release-name>/
+ssh root@<server-ip> "ln -sfn /var/www/city-widget/releases/<release-name> /var/www/city-widget/current && nginx -t && systemctl enable --now nginx && systemctl reload nginx"
+```
+
+Nginx должен быть настроен на `root /var/www/city-widget/current`, а API-маршруты `/api/timepad/` и `/api/kudago/` — проксированы к источникам данных. Для TimePad задайте токен в защищённой конфигурации Nginx на сервере; не добавляйте его в Git или в клиентскую сборку. TLS-сертификат и доменные имена также настраиваются на сервере. `nginx.conf.template` используется Docker-образом и не заменяет production-конфигурацию Nginx на хосте.
+
+Проверить конфигурацию Nginx можно командой `nginx -t`. Запустить его при перезагрузке сервера и сразу включить сейчас: `systemctl enable --now nginx`. Остановить сайт: `systemctl stop nginx` (это выключит все сайты, обслуживаемые этим экземпляром Nginx).
+
+В репозитории также оставлена Docker-конфигурация (`Dockerfile` и `docker-compose.yml`) для окружений, где Docker установлен.
 
 ## Что внутри
 
